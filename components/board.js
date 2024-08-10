@@ -46,7 +46,7 @@ export const Board = () => {
   const setMole = () => {
     let mole = html`<img
       src="${'../public/monty-mole.png'}"
-      onClick="${() => scoreStore((current) => current + 10)}" />`;
+      onClick="${() => setScore((current) => current + 10)}" />`;
 
     let indexId = getRandomIndex().toString();
 
