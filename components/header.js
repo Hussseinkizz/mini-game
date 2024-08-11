@@ -1,5 +1,4 @@
-import { css, html, reactive, useStore } from 'z-js-framework';
-import { scoreStore } from '../store';
+import { css, html, reactive } from '../z-js-framework';
 
 const headerStyles = css`
   width: 100%;
@@ -12,12 +11,10 @@ const headerStyles = css`
   border-radius: 6px;
 `;
 
-export const Header = () => {
-  const [score, setScore] = useStore(scoreStore);
-
+export const Header = (score) => {
   let header = () => html`
     <header class="${headerStyles}">
-      <h1>Whack A Mole!</h1>
+      <h1>🤓 Whack A Mole!</h1>
       <h2>
         Score:
         <span class="score">${score}</span>

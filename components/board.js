@@ -1,5 +1,11 @@
-import { css, getRef, html, useEffect, useState } from 'z-js-framework';
-import { scoreStore } from '../store';
+import {
+  css,
+  getRef,
+  html,
+  reactive,
+  useEffect,
+  useState,
+} from '../z-js-framework';
 
 const boardStyles = css`
   width: 540px;
@@ -24,71 +30,150 @@ const tileStyles = css`
   background-size: cover;
 `;
 
-export const Board = () => {
+const popupStyles = css`
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #ff7979;
+  font-weight: 600;
+  font-size: 3rem;
+  z-index: 100;
+  display: none;
+  & > button {
+    border: 2px solid #fff;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    color: #fff;
+    background: #d93939;
+    &:hover {
+      background: #ff7979;
+      color: #d93939;
+    }
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+`;
+
+export const Board = (score, setScore) => {
   const [currentMoleTile, setCurrentMoleTile] = useState(null);
   const [currentPlantTile, setCurrentPlantTile] = useState(null);
-  const [score, setScore] = useState(scoreStore);
+  const [gameOver, setGameOver] = useState(false);
 
-  const setGame = (gridCount = 9, parent = null) => {
-    for (let i = 0; i < gridCount; i++) {
-      let el = html`<div ref="${i}" class="${tileStyles}"></div>`;
-      parent?.appendChild(el);
-    }
-
+  const restartGame = () => {
+    setScore(0);
+    setGameOver(false);
     startGame();
+    popup.style.display = 'none';
   };
+
+  let popup = html`<div class="${popupStyles}" ref="popupRef">
+    😳
+    <h1>Game Over!</h1>
+    <button onClick="${restartGame}">Restart</button>
+  </div>`;
+
+  let board = html`
+    <section class="${boardStyles}" ref="boardElement">${popup}</section>
+  `;
+
+  let _interval1 = null;
+  let _interval2 = null;
 
   const getRandomIndex = () => {
     let index = Math.floor(Math.random() * 9);
     return index;
   };
 
+  const endGame = () => {
+    console.log('game over');
+    setGameOver(true);
+    clearInterval(_interval1);
+    clearInterval(_interval2);
+    let _target1 = getRef(currentMoleTile.current());
+    let _target2 = getRef(currentPlantTile.current());
+    _target1.style.pointerEvents = 'none';
+    _target2.style.pointerEvents = 'none';
+    popup.style.display = 'flex';
+  };
+
+  const handleScore = () => {
+    console.log('score');
+    setScore((current) => current + 10);
+  };
+
   const setMole = () => {
     let mole = html`<img
       src="${'../public/monty-mole.png'}"
-      onClick="${() => setScore((current) => current + 10)}" />`;
+      class="character"
+      onClick="${handleScore}" />`;
 
     let indexId = getRandomIndex().toString();
+    if (currentMoleTile.current() === indexId) {
+      indexId = getRandomIndex().toString();
+    }
 
-    if (currentMoleTile.current()) {
+    if (currentMoleTile.current() && !gameOver.current()) {
       let _target = getRef(currentMoleTile.current());
       _target.innerHTML = '';
     }
-    if (currentMoleTile.current() === indexId) {
-      return;
-    }
-    let target = getRef(indexId);
+
+    let target = board.querySelector(`[ref="${indexId}"]`);
     target.appendChild(mole);
     setCurrentMoleTile(indexId);
   };
 
-  const startGame = () => {
-    setInterval(setMole, 1000);
-    setInterval(setPlant, 1000);
-  };
-
   const setPlant = () => {
-    let plant = html`<img src="${'../public/piranha-plant.png'}" />`;
+    let plant = html`<img
+      src="${'../public/piranha-plant.png'}"
+      class="character"
+      onClick="${endGame}" />`;
+
     let indexId = getRandomIndex().toString();
-    if (currentPlantTile.current()) {
+    if (
+      currentPlantTile.current() === indexId ||
+      currentPlantTile.current() === currentMoleTile.current()
+    ) {
+      indexId = getRandomIndex().toString();
+    }
+
+    if (currentPlantTile.current() && !gameOver.current()) {
       let _target = getRef(currentPlantTile.current());
       _target.innerHTML = '';
     }
-    if (currentPlantTile.current() === indexId) {
-      return;
-    }
-    let target = getRef(indexId);
+
+    let target = board.querySelector(`[ref="${indexId}"]`);
     target.appendChild(plant);
     setCurrentPlantTile(indexId);
   };
 
-  let board = html`
-    <section class="${boardStyles}" ref="boardElement"></section>
-  `;
+  const startGame = () => {
+    _interval1 && clearInterval(_interval1); // clear any old intervals
+    _interval1 = setInterval(setMole, 1000);
+
+    _interval2 && clearInterval(_interval2);
+    _interval2 = setInterval(setPlant, 1000);
+  };
+
+  const setGame = (gridCount = 9, parent = null) => {
+    for (let i = 0; i < gridCount; i++) {
+      let el = html`<div ref="${i}" class="${tileStyles}"></div>`;
+      parent?.appendChild(el);
+    }
+    startGame();
+  };
 
   useEffect(() => {
     setGame(9, board);
   }, []);
 
-  return board;
+  return reactive(() => board);
 };

@@ -48,6 +48,7 @@ body {
   place-items: center;
   background: url('../public/mario-bg.jpg');
   background-size: cover;
+  user-select: none;
 }
 
 z-link {
@@ -68,4 +69,14 @@ z-link:hover {
   right: 1rem;
   color: green;
   z-index: 100;
+}
+
+.score {
+  font-size: 2rem;
+  margin-left: 1rem;
+}
+
+.character:active {
+  transform: scale(0.9);
+  transition: transform 0.1s;
 }
