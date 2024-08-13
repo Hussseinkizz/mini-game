@@ -84,10 +84,11 @@ const playButtonStyles = css`
   }
 `;
 
-export const Board = (score, setScore, setBackgroundMusic) => {
+export const Board = (score, setScore, setBackgroundMusic, isPlaying) => {
   const [currentMoleTile, setCurrentMoleTile] = useState(null);
   const [currentPlantTile, setCurrentPlantTile] = useState(null);
   const [gameOver, setGameOver] = useState(false);
+  const [wasStopped, setWasStopped] = useState(false);
 
   const restartGame = () => {
     setScore(0);
@@ -123,7 +124,6 @@ export const Board = (score, setScore, setBackgroundMusic) => {
   };
 
   function endGame() {
-    console.log('game over');
     setGameOver(true);
     clearInterval(_interval1);
     clearInterval(_interval2);
@@ -133,10 +133,10 @@ export const Board = (score, setScore, setBackgroundMusic) => {
     _target2.style.pointerEvents = 'none';
     popup.style.display = 'flex';
     setBackgroundMusic(false);
+    setWasStopped(false);
   }
 
   const handleScore = () => {
-    console.log('score');
     setScore((current) => current + 10);
   };
 
@@ -186,6 +186,11 @@ export const Board = (score, setScore, setBackgroundMusic) => {
   };
 
   function startGame() {
+    if (wasStopped.current()) {
+      /* setScore(0); */
+      setGameOver(false);
+      popup.style.display = 'none';
+    }
     _interval1 && clearInterval(_interval1); // clear any old intervals
     _interval1 = setInterval(setMole, 1000);
 
@@ -205,6 +210,16 @@ export const Board = (score, setScore, setBackgroundMusic) => {
   useEffect(() => {
     setGame(9, board);
   }, []);
+
+  useEffect(() => {
+    if (!isPlaying.current()) {
+      endGame();
+      popup.style.display = 'none';
+      playButton.style.display = 'flex';
+      playButton.innerHTML = 'Play Again';
+      setWasStopped(true);
+    }
+  }, [isPlaying]);
 
   return reactive(() => board);
 };

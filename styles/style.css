@@ -34,6 +34,14 @@
   align-items: start;
 }
 
+.items-center {
+  align-items: center;
+}
+
+.nowrap {
+  flex-wrap: nowrap;
+}
+
 @media (max-width: 768px) {
   .flex {
     flex-direction: column;
@@ -79,4 +87,28 @@ z-link:hover {
 .character:active {
   transform: scale(0.9);
   transition: transform 0.1s;
+}
+
+.mobile\:hidden {
+  display: none !important;
+}
+
+.medium\:hidden {
+  display: flex;
+}
+
+.medium\:visible {
+  display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .mobile\:hidden {
+    display: flex !important;
+  }
+  .medium\:hidden {
+    display: none !important;
+  }
+  .medium\:visible {
+    display: flex !important;
+  }
 }

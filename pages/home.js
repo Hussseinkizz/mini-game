@@ -27,12 +27,13 @@ const ruleStyles = css`
 export default function Home() {
   const [score, setScore] = useState(0);
   const [backgroundMusic, setBackgroundMusic] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   let UI = html`
     <main class="flex container">
-      ${Header(score)}
+      ${Header(score, setIsPlaying)}
       <section class="flex">
-        <div class="${ruleStyles}">
+        <div class="${ruleStyles} mobile:hidden">
           <h1>How To Play</h1>
           <p>
             Whack a mole game is so easy, tap the monty mole and gain score, tap
@@ -59,7 +60,7 @@ export default function Home() {
             </h6>
           </div>
         </div>
-        ${Board(score, setScore, setBackgroundMusic)}
+        ${Board(score, setScore, setBackgroundMusic, isPlaying)}
       </section>
       <audio loop id="audioPlayer" style="display: none" ref="audioPlayer">
         <source
