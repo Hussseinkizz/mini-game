@@ -1,6 +1,13 @@
-import { css, html, reactive, useState } from '../z-js-framework';
-import { Header } from '../components/header';
-import { Board } from '../components/board';
+import {
+  css,
+  getRef,
+  html,
+  reactive,
+  useEffect,
+  useState,
+} from '../z-js-framework/dist/z.js';
+import { Header } from '../components/header.js';
+import { Board } from '../components/board.js';
 
 const ruleStyles = css`
   width: 350px;
@@ -19,8 +26,9 @@ const ruleStyles = css`
 
 export default function Home() {
   const [score, setScore] = useState(0);
+  const [backgroundMusic, setBackgroundMusic] = useState(false);
 
-  let UI = () => html`
+  let UI = html`
     <main class="flex container">
       ${Header(score)}
       <section class="flex">
@@ -45,12 +53,48 @@ export default function Home() {
                 Z Js Framework</a
               >
             </h6>
+            <h6 class="flex-row">
+              Project On Github:
+              <a href="https://github.com/Hussseinkizz/mini-game"> Mini Game</a>
+            </h6>
           </div>
         </div>
-        ${Board(score, setScore)}
+        ${Board(score, setScore, setBackgroundMusic)}
       </section>
+      <audio loop id="audioPlayer" style="display: none" ref="audioPlayer">
+        <source
+          src="../public/music/mixkit-game-level-music-689.wav"
+          type="audio/wav" />
+      </audio>
+      <audio id="tapAudioPlayer" style="display: none" ref="tapAudioPlayer">
+        <source
+          src="../public/music/mixkit-player-jumping-in-a-video-game-2043.wav"
+          type="audio/wav" />
+      </audio>
     </main>
   `;
 
-  return reactive(UI);
+  const playMusic = () => {
+    let audioPlayer = getRef('audioPlayer');
+    if (backgroundMusic.current()) {
+      audioPlayer.play();
+    } else {
+      audioPlayer.pause();
+    }
+  };
+
+  const playTapMusic = () => {
+    let tapAudioPlayer = getRef('tapAudioPlayer');
+    tapAudioPlayer.play();
+  };
+
+  useEffect(() => {
+    playMusic();
+  }, [backgroundMusic]);
+
+  useEffect(() => {
+    playTapMusic();
+  }, [score]);
+
+  return reactive(() => UI);
 }

@@ -1,4 +1,4 @@
-import { css, html, reactive } from '../z-js-framework';
+import { css, html, reactive } from '../z-js-framework/dist/z.js';
 
 const headerStyles = css`
   width: 100%;

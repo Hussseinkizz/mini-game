@@ -5,7 +5,7 @@ import {
   reactive,
   useEffect,
   useState,
-} from '../z-js-framework';
+} from '../z-js-framework/dist/z.js';
 
 const boardStyles = css`
   width: 540px;
@@ -19,6 +19,7 @@ const boardStyles = css`
   display: grid;
   margin-top: 2rem;
   grid-template-columns: repeat(3, 1fr);
+  place-items: center;
   background: url('../public/soil.png');
   background-size: cover;
 `;
@@ -63,7 +64,27 @@ const popupStyles = css`
   }
 `;
 
-export const Board = (score, setScore) => {
+const playButtonStyles = css`
+  border: 4px solid #fff;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  height: 3rem;
+  width: 10rem;
+  color: #fff;
+  position: absolute;
+  z-index: 1000;
+  font-weight: 700;
+  background: #3b6b38;
+  &:hover {
+    background: #50934c;
+    color: #3b6b38;
+  }
+  &:active {
+    transform: scale(0.9);
+  }
+`;
+
+export const Board = (score, setScore, setBackgroundMusic) => {
   const [currentMoleTile, setCurrentMoleTile] = useState(null);
   const [currentPlantTile, setCurrentPlantTile] = useState(null);
   const [gameOver, setGameOver] = useState(false);
@@ -75,6 +96,12 @@ export const Board = (score, setScore) => {
     popup.style.display = 'none';
   };
 
+  let playButton = html`<button
+    class="${playButtonStyles}"
+    onClick="${startGame}">
+    Play
+  </button>`;
+
   let popup = html`<div class="${popupStyles}" ref="popupRef">
     😳
     <h1>Game Over!</h1>
@@ -82,7 +109,9 @@ export const Board = (score, setScore) => {
   </div>`;
 
   let board = html`
-    <section class="${boardStyles}" ref="boardElement">${popup}</section>
+    <section class="${boardStyles}" ref="boardElement">
+      ${popup} ${playButton}
+    </section>
   `;
 
   let _interval1 = null;
@@ -93,7 +122,7 @@ export const Board = (score, setScore) => {
     return index;
   };
 
-  const endGame = () => {
+  function endGame() {
     console.log('game over');
     setGameOver(true);
     clearInterval(_interval1);
@@ -103,7 +132,8 @@ export const Board = (score, setScore) => {
     _target1.style.pointerEvents = 'none';
     _target2.style.pointerEvents = 'none';
     popup.style.display = 'flex';
-  };
+    setBackgroundMusic(false);
+  }
 
   const handleScore = () => {
     console.log('score');
@@ -155,21 +185,22 @@ export const Board = (score, setScore) => {
     setCurrentPlantTile(indexId);
   };
 
-  const startGame = () => {
+  function startGame() {
     _interval1 && clearInterval(_interval1); // clear any old intervals
     _interval1 = setInterval(setMole, 1000);
 
     _interval2 && clearInterval(_interval2);
     _interval2 = setInterval(setPlant, 1000);
-  };
+    playButton.style.display = 'none';
+    setBackgroundMusic(true);
+  }
 
-  const setGame = (gridCount = 9, parent = null) => {
+  function setGame(gridCount = 9, parent = null) {
     for (let i = 0; i < gridCount; i++) {
       let el = html`<div ref="${i}" class="${tileStyles}"></div>`;
       parent?.appendChild(el);
     }
-    startGame();
-  };
+  }
 
   useEffect(() => {
     setGame(9, board);
