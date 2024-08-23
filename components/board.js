@@ -7,6 +7,7 @@ import {
   useState,
 } from '../z-js-framework/dist/z.js';
 
+
 const boardStyles = css`
   width: 540px;
   height: 540px;
@@ -84,7 +85,7 @@ const playButtonStyles = css`
   }
 `;
 
-export const Board = (score, setScore, setBackgroundMusic, isPlaying) => {
+export const Board = (score,fail,setFail, setScore, setBackgroundMusic, isPlaying) => {
   const [currentMoleTile, setCurrentMoleTile] = useState(null);
   const [currentPlantTile, setCurrentPlantTile] = useState(null);
   const [gameOver, setGameOver] = useState(false);
@@ -96,6 +97,7 @@ export const Board = (score, setScore, setBackgroundMusic, isPlaying) => {
     startGame();
     popup.style.display = 'none';
   };
+
 
   let playButton = html`<button
     class="${playButtonStyles}"
@@ -165,7 +167,11 @@ export const Board = (score, setScore, setBackgroundMusic, isPlaying) => {
     let plant = html`<img
       src="${'../public/piranha-plant.png'}"
       class="character"
-      onClick="${endGame}" />`;
+     onClick="${() => {
+      endGame();
+      setFail(true)
+    
+    }}"  />`;
 
     let indexId = getRandomIndex().toString();
     if (
