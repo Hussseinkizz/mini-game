@@ -26,6 +26,7 @@ const ruleStyles = css`
 
 export default function Home() {
   const [score, setScore] = useState(0);
+  const [fail,setFail] = useState(false)
   const [backgroundMusic, setBackgroundMusic] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -60,7 +61,7 @@ export default function Home() {
             </h6>
           </div>
         </div>
-        ${Board(score, setScore, setBackgroundMusic, isPlaying)}
+        ${Board(score,fail,setFail, setScore, setBackgroundMusic, isPlaying)}
       </section>
       <audio loop id="audioPlayer" style="display: none" ref="audioPlayer">
         <source
@@ -70,6 +71,12 @@ export default function Home() {
       <audio id="tapAudioPlayer" style="display: none" ref="tapAudioPlayer">
         <source
           src="../public/music/mixkit-player-jumping-in-a-video-game-2043.wav"
+          type="audio/wav" />
+      </audio>
+
+       <audio id="gameOver" style="display: none" ref="gameOver">
+        <source
+          src="../public/music/mix-kit-ni.wav"
           type="audio/wav" />
       </audio>
     </main>
@@ -92,6 +99,16 @@ export default function Home() {
   useEffect(() => {
     playMusic();
   }, [backgroundMusic]);
+
+  const stopGame = () => {
+    let failAudioPlayer = getRef('gameOver');
+    failAudioPlayer.play();
+  };
+
+  useEffect(() => {
+    stopGame();
+  }, [fail]);
+
 
   useEffect(() => {
     playTapMusic();
